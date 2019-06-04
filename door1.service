@@ -1,0 +1,16 @@
+[Unit]
+Description=Door status listener
+
+[Service]
+User=pi
+Type=simple
+TimeoutSec=0
+PIDFile=/var/run/php_app_sync.pid
+ExecStart=/bin/sh -c 'usr/bin/php /var/www/html/door_controller.php'
+KillMode=mixed
+
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=default.target
