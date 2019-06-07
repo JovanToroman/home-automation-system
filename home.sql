@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 04, 2019 at 03:46 PM
+-- Generation Time: Jun 07, 2019 at 08:14 AM
 -- Server version: 10.1.38-MariaDB-0+deb9u1
 -- PHP Version: 7.0.33-0+deb9u3
 
@@ -32,12 +32,17 @@ CREATE TABLE `dooropening` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `dooropening`
+-- Table structure for table `lightbulbstate`
 --
 
-INSERT INTO `dooropening` (`id`, `event`, `timestamp`) VALUES
-(1, 'openin', '2019-06-04 15:42:34');
+CREATE TABLE `lightbulbstate` (
+  `id` int(11) NOT NULL,
+  `state` tinyint(4) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -52,14 +57,6 @@ CREATE TABLE `temperature` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `temperature`
---
-
-INSERT INTO `temperature` (`id`, `value`, `timestamp`) VALUES
-(3, 22.22, '2019-06-04 15:33:28'),
-(4, 22.22, '2019-06-04 15:35:53');
-
---
 -- Indexes for dumped tables
 --
 
@@ -67,6 +64,12 @@ INSERT INTO `temperature` (`id`, `value`, `timestamp`) VALUES
 -- Indexes for table `dooropening`
 --
 ALTER TABLE `dooropening`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `lightbulbstate`
+--
+ALTER TABLE `lightbulbstate`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -83,12 +86,17 @@ ALTER TABLE `temperature`
 -- AUTO_INCREMENT for table `dooropening`
 --
 ALTER TABLE `dooropening`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+--
+-- AUTO_INCREMENT for table `lightbulbstate`
+--
+ALTER TABLE `lightbulbstate`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `temperature`
 --
 ALTER TABLE `temperature`
-  MODIFY `id` int(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=403;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
