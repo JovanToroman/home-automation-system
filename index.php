@@ -47,7 +47,7 @@
     <?php
     sleep(2);
     $mysqli = new mysqli('localhost', 'jovan', 'password', 'home');
-    $query_state = "SELECT * FROM lightbulbstate WHERE TIME(`timestamp`) = (SELECT MAX(TIME(`timestamp`)) FROM lightbulbstate)";
+    $query_state = "SELECT * FROM lightbulbstate WHERE id = (SELECT max(id) FROM lightbulbstate)";
     $lightbulb_state = "State not available";
     if(!$result = $mysqli->query($query_state)) {
     echo "Query failed with message: " . $mysqli->error . " and 
@@ -58,7 +58,6 @@
         $lightbulb_state = $result->fetch_assoc()['state'];
     }
     
-
     if($lightbulb_state == 1){
             echo "<h5 style='color:green;'>Lightbulb is currently ON</h5>";
     } elseif($lightbulb_state == 0) {
@@ -80,7 +79,7 @@
 		<input class="btn btn-default btn-block" style="margin-top: 10px;" type="submit" value="Show temperature">
 	</form>
     <?php
-    $query_temp = "SELECT * FROM temperature WHERE TIME(`timestamp`) = (SELECT MAX(TIME(`timestamp`)) FROM temperature)";
+    $query_temp = "SELECT * FROM temperature WHERE id = (SELECT max(id) FROM temperature)";
     $temp = "Temperature not available";
     if(!$result = $mysqli->query($query_temp)) {
         echo "Query failed with message: " . $mysqli->error . " and 
@@ -99,7 +98,7 @@
 		<input class="btn btn-default btn-block" style="margin-top: 10px;" type="submit" value="Show door openings">
 	</form>
     <?php
-    $query_opening = "SELECT * FROM dooropening WHERE TIME(`timestamp`) = (SELECT MAX(TIME(`timestamp`)) FROM dooropening)";
+    $query_opening = "SELECT * FROM dooropening WHERE id = (SELECT max(id) FROM dooropening)";
     $door_state = "Door opening info not available";
     if(!$result = $mysqli->query($query_opening)) {
         echo "Query failed with message: " . $mysqli->error . " and 

@@ -12,7 +12,15 @@ if($mysqli->connect_errno) {
 function procmsg($topic, $msg){
     global $mysqli;
     
-    $sql = "INSERT INTO `lightbulbstate`(`state`) VALUES($msg)";
+    echo "msg:" . substr($msg, 0, 2) . ":end";
+    if (substr($msg, 0, 2) == 'on') {
+        $sql = "INSERT INTO `lightbulbstate`(`state`) VALUES(1)";
+    } elseif (substr($msg, 0, 3) == 'off') {
+        $sql = "INSERT INTO `lightbulbstate`(`state`) VALUES(0)";
+    } else {
+        // if lightbulb is not working
+        $sql = "INSERT INTO `lightbulbstate`(`state`) VALUES(2)";
+    }
     if(!$result = $mysqli->query($sql)) {
         echo "Query failed with message: " . $mysqli->error . " and 
         error code " . $mysqli->errno;

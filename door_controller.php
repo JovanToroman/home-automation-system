@@ -47,7 +47,7 @@ function get_lightbulb_state() {
 
 function toggle_lightbulb($msg) {
     $lightbulb_state = get_lightbulb_state();
-    if ($msg == "opened") {
+    if (substr($msg, 0, 6) == "opened") {
         send_lightbulb_toggle_signal();
     }
 }
