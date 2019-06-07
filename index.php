@@ -44,15 +44,29 @@
 	<form action="/toggle_lightbulb.php">
 		<input class="btn btn-default btn-block" style="margin-top: 10px;" type="submit" value="Toggle lightbulb">
 	</form>
-    <?php 
+    <?php
     sleep(2);
-    $lightbulb_state = include 'lightbulb_state.txt'; 
-    if($lightbulb_state == 'on'){
-            echo "<h5 style='color:green;'>Lightbulb is currently ON</h5>";
-    } elseif($lightbulb_state == 'off') {
-            echo "<h5 style='color:red;'>Lightbulb is currently OFF</h5>";
+    $mysqli = new mysqli('localhost', 'jovan', 'password', 'home');
+    $query_state = "SELECT * FROM lightbulbstate WHERE TIME(`timestamp`) = (SELECT MAX(TIME(`timestamp`)) FROM lightbulbstate)";
+    $lightbulb_state = "State not available";
+    if(!$result = $mysqli->query($query_state)) {
+    echo "Query failed with message: " . $mysqli->error . " and 
+    error code " . $mysqli->errno;
+    }elseif ($result->num_rows === 0) {
+        echo "No information about light bulb state";
+    } else {
+        $lightbulb_state = $result->fetch_assoc()['state'];
     }
     
+
+    if($lightbulb_state == 1){
+            echo "<h5 style='color:green;'>Lightbulb is currently ON</h5>";
+    } elseif($lightbulb_state == 0) {
+            echo "<h5 style='color:red;'>Lightbulb is currently OFF</h5>";
+    } else {
+        echo "<h5>Lightbulb is not functioning properly.</h5>";
+    }
+
     if($_GET['toggleSuccessful'] == 1){
             echo "<h5 id='info'>Info: Toggle lightbulb signal sucessfully sent</h5><button id='clearButt' class='btn' onclick='clearInfo();' type='button'>clear</button>";
     } elseif ($_GET['toggleSuccessful'] != NULL){
@@ -66,9 +80,17 @@
 		<input class="btn btn-default btn-block" style="margin-top: 10px;" type="submit" value="Show temperature">
 	</form>
     <?php
-    $temp_info = include 'temperatures.txt'; 
-    $last_temp = explode(":", end($temp_info))[0];
-    echo "<h5>Last measured temperature was " . $last_temp . " C</h5>";?>
+    $query_temp = "SELECT * FROM temperature WHERE TIME(`timestamp`) = (SELECT MAX(TIME(`timestamp`)) FROM temperature)";
+    $temp = "Temperature not available";
+    if(!$result = $mysqli->query($query_temp)) {
+        echo "Query failed with message: " . $mysqli->error . " and 
+        error code " . $mysqli->errno;
+    } elseif ($result->num_rows === 0) {
+        echo "No information about temperature";
+    } else {
+        $temp = $result->fetch_assoc()['value'];
+    }
+    echo "<h5>Last measured temperature was " . $temp . " C</h5>";?>
     </div>
     </li>
     <li class="nav-item">
@@ -77,8 +99,16 @@
 		<input class="btn btn-default btn-block" style="margin-top: 10px;" type="submit" value="Show door openings">
 	</form>
     <?php
-    $door_info = include 'openings.txt'; 
-    $door_state = explode(":", end($door_info))[0];
+    $query_opening = "SELECT * FROM dooropening WHERE TIME(`timestamp`) = (SELECT MAX(TIME(`timestamp`)) FROM dooropening)";
+    $door_state = "Door opening info not available";
+    if(!$result = $mysqli->query($query_opening)) {
+        echo "Query failed with message: " . $mysqli->error . " and 
+        error code " . $mysqli->errno;
+    } elseif ($result->num_rows === 0) {
+        echo "No information about door openings";
+    } else {
+        $door_state = $result->fetch_assoc()['event'];
+    }
     if(trim($door_state) == 'closed'){
             echo "<h5 style='color:green;'>Doors are currently CLOSED</h5>";
     } elseif(trim($door_state) == 'opened') {

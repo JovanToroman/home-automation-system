@@ -1,5 +1,42 @@
 <?php
-$temperatures = include 'temperatures.txt'; ?>
+if (isset($_GET['pageno'])) {
+    $pageno = $_GET['pageno'];
+} else {
+    $pageno = 1;
+}
+$no_of_records_per_page = 10;
+$offset = ($pageno-1) * $no_of_records_per_page;
+$mysqli = new mysqli('localhost', 'jovan', 'password', 'home');
+if($_GET['dateFrom'] == NULL && $_GET['dateTo'] == NULL){
+    $init_vals = "SELECT * FROM temperature WHERE DATE(`timestamp`) = CURDATE() LIMIT $offset, $no_of_records_per_page";
+    $total_pages_sql = "SELECT COUNT(*) FROM temperature WHERE DATE(`timestamp`) = CURDATE()";
+} elseif ($_GET['dateFrom'] != NULL && $_GET['dateTo'] == NULL){
+    $init_vals = "SELECT * FROM temperature WHERE DATE(`timestamp`) >= DATE('" . $_GET['dateFrom'] . "') LIMIT $offset, $no_of_records_per_page";
+    $total_pages_sql = "SELECT COUNT(*) FROM temperature WHERE DATE(`timestamp`) >= DATE('" . $_GET['dateFrom'] . "')";
+} elseif ($_GET['dateFrom'] == NULL && $_GET['dateTo'] != NULL){
+    $init_vals = "SELECT * FROM temperature WHERE DATE(`timestamp`) <= DATE('" . $_GET['dateTo'] . "') LIMIT $offset, $no_of_records_per_page";
+    $total_pages_sql = "SELECT COUNT(*) FROM temperature WHERE DATE(`timestamp`) <= DATE('" . $_GET['dateTo'] . "')";
+} else {
+    $init_vals = "SELECT * FROM temperature WHERE DATE(`timestamp`) <= DATE('" 
+    . $_GET['dateTo'] . "') AND DATE(`timestamp`) >= DATE('" . $_GET['dateFrom'] . "') LIMIT $offset, $no_of_records_per_page";
+    $total_pages_sql = "SELECT COUNT(*) FROM temperature WHERE DATE(`timestamp`) <= DATE('" 
+    . $_GET['dateTo'] . "') AND DATE(`timestamp`) >= DATE('" . $_GET['dateFrom'] . "')";
+}
+
+$conn=mysqli_connect('localhost', 'jovan', 'password', 'home');
+// Check connection
+if (mysqli_connect_errno()){
+    echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    die();
+}
+
+//$total_pages_sql = "SELECT COUNT(*) FROM table";
+$result = mysqli_query($conn,$total_pages_sql);
+$total_rows = mysqli_fetch_array($result)[0];
+$total_pages = ceil($total_rows / $no_of_records_per_page);
+
+mysqli_close($conn);
+?>
 <!DOCTYPE html>
 <html>
 <header>
@@ -30,6 +67,20 @@ $temperatures = include 'temperatures.txt'; ?>
     </div>
 <div class="container col-md-3">
 <h3>Temperatures</h3>
+<div>
+    <h4>Filter data</h4>
+    <form action="/temperature.php">
+        <div class="form-group">
+            <label for="dateFrom">Date from:</label>
+            <input type="date" class="form-control" id="dateFrom" name="dateFrom">
+        </div>
+        <div class="form-group">
+            <label for="dateTo">Date to:</label>
+            <input type="date" class="form-control" id="dateTo" name="dateTo">
+        </div>
+        <input class="btn btn-default btn-block" style="margin-top: 10px;" type="submit" value="Apply">
+    </form>
+</div>
 <table class="table">
 <thead>
 <tr>
@@ -40,19 +91,42 @@ $temperatures = include 'temperatures.txt'; ?>
 </thead>
 <tbody>
 <?php 
-$count = 0;
-foreach($temperatures as $temp): 
+$count = ($pageno - 1) * $no_of_records_per_page;
+if(!$result = $mysqli->query($init_vals)) {
+    echo "Query failed with message: " . $mysqli->error . " and 
+    error code " . $mysqli->errno;
+}
+if ($result->num_rows === 0) {
+    echo "No temperatures today";
+}
+while ($row = $result->fetch_assoc()) {
 $count += 1;
 ?>
   <tr>
     <th scope="row"><?php echo $count; ?></th>
-    <td><?php 
-    $vals = explode(":", $temp);
-    print $vals[0]; ?></td>
-    <td><?php print $vals[1] . ":" . $vals[2] . ":" . $vals[3]; ?></td>
+    <td><?php
+    print $row['value']; ?></td>
+    <td><?php print $row['timestamp']; ?></td>
   </tr>
-<?php endforeach; ?>
+<?php } ?>
 </tbody>
+<ul class="pagination">
+    <li><a href="?pageno=1&dateFrom=<?php echo $_GET['dateFrom'] . "&dateTo=" . $_GET['dateTo']; ?>">First</a></li>
+    <li class="<?php if($pageno <= 1){ echo 'disabled'; } ?>">
+        <a href="<?php if($pageno <= 1){ echo '#'; } else { echo "?pageno=".($pageno - 1) . "&dateFrom=" . $_GET['dateFrom'] . "&dateTo=" . $_GET['dateTo']; } ?>">Prev</a>
+    </li>
+    <li class="<?php if($pageno >= $total_pages){ echo 'disabled'; } ?>">
+        <a href="<?php if($pageno >= $total_pages){ echo '#'; } else { echo "?pageno=".($pageno + 1) . "&dateFrom=" . $_GET['dateFrom'] . "&dateTo=" . $_GET['dateTo']; } ?>">Next</a>
+    </li>
+    <li><a href="?pageno=<?php 
+    if ($total_pages != 0) {
+        echo $total_pages;
+    } else {
+        echo 1;
+    }
+    echo "&dateFrom=" . $_GET['dateFrom'] . "&dateTo=" . $_GET['dateTo'];
+     ?>">Last</a></li>
+</ul>
 </table>
 </div>
 </body>
