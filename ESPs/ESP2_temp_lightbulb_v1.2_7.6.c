@@ -105,16 +105,16 @@ static void  topic_received(mqtt_message_data_t *md)
 
     printf(" = ");
     char mess[] = "toggle31071993";
-    char mess_res[] = "reset";
+    char mess_res[] = "restart";
     bool isToggle = true;
-    bool isReset = true;
+    bool isRestart = true;
     for( i = 0; i < (int)message->payloadlen; ++i) {
         printf("%c", ((char *)(message->payload))[i]);
         if (((char *)(message->payload))[i] != mess[i]) {
             isToggle = false;
         }
         if (((char *)(message->payload))[i] != mess_res[i]) {
-            isReset = false;
+            isRestart = false;
         }
     }
     if (isToggle) {
@@ -123,7 +123,7 @@ static void  topic_received(mqtt_message_data_t *md)
         gpio_write(LGHT_BLB_PIN, isOn);
     }
 
-    if (isReset) {
+    if (isRestart) {
         isRestarting = true;
         sdk_system_restart();
     }

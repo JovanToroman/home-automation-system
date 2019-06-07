@@ -206,15 +206,15 @@ static void  topic_received(mqtt_message_data_t *md)
         printf("%c", md->topic->lenstring.data[ i ]);
 
     printf(" = ");
-    char mess[] = "reset";
-    bool isReset = true;
+    char mess[] = "restart";
+    bool isRestart = true;
     for( i = 0; i < (int)message->payloadlen; ++i) {
         printf("%c", ((char *)(message->payload))[i]);
         if (((char *)(message->payload))[i] != mess[i]) {
-            isReset = false;
+            isRestart = false;
         }
     }
-    if (isReset) {
+    if (isRestart) {
         sdk_system_restart();
     }
 
